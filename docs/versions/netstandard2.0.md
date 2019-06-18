@@ -1,6 +1,6 @@
 # .NET Standard 2.0
 
-[Overview](../versions.md) | [Previous](netstandard1.6.md)
+[Overview](../versions.md) | [Previous](netstandard1.6.md) | [Next](netstandard2.1.md)
 
 * [APIs](netstandard2.0_ref.md)
 * [Diff with 1.6](netstandard2.0_diff.md)
@@ -13,8 +13,8 @@
 * Mono 5.4
 * Xamarin.iOS 10.14
 * Xamarin.Mac 3.8
-* Xamarin.Android 7.5
-* Universal Windows Platform vNext
+* Xamarin.Android 8.0
+* Universal Windows Platform 10.0.16299
 
 ## What's new?
 

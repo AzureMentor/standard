@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), Directory.Build.props))\Directory.Build.props" />
+
+  <PropertyGroup>
+    <MajorVersion>2</MajorVersion>
+    <MinorVersion>1</MinorVersion>
+    <HarvestStablePackage>false</HarvestStablePackage>
+    <SkipPackageFileCheck>true</SkipPackageFileCheck>
+    <OmitDependencies>true</OmitDependencies>
+    <SkipValidatePackage>true</SkipValidatePackage>
+    <TargetsFileName>NETStandard.Library.targets</TargetsFileName>
+    <VersionTargetsTemplate>targets\netstandard\$(TargetsFileName)</VersionTargetsTemplate>
+    <NETStandardVersion>netstandard2.1</NETStandardVersion>
+    <VersionTargetsSource>$(IntermediateOutputPath)$(NETStandardVersion)\$(TargetsFileName)</VersionTargetsSource>
+  </PropertyGroup>
+
+  <Import Project="NETStandard.Library.dependencies.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\ref\netstandard.csproj" />
+    <ProjectReference Include="shims\netstandard\dir.builds">
+      <Facade>true</Facade>
+    </ProjectReference>
+    <ProjectReference Include="shims\netfx\dir.builds">
+      <Facade>true</Facade>
+    </ProjectReference>
+
+    <NetStandard20Files Include="$(PackagesDir)$(NetStandardLibraryPackage)/$(NetStandardLibraryPackageVersion)/build/netstandard2.0/**">
+      <TargetPath>build/netstandard2.0/%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </NetStandard20Files>
+
+    <File Include="$(VersionTargetsSource)">
+      <TargetPath>build/$(NETStandardVersion)/$(Id).targets</TargetPath>
+    </File>
+
+    <File Include="$(PlaceHolderFile)">
+      <TargetPath>lib/netstandard1.0</TargetPath>
+    </File>
+
+    <File Include="@(NetStandard20Files)" />
+  </ItemGroup>
+
+  <Target Name="EnsureRestoredNetStandardAssets" BeforeTargets="GenerateNuSpec">
+    <Error Condition="'@(NetStandard20Files)' == ''AND '$(DotNetBuildFromSource)' != 'true'" Text="Could not find package assets for netstandard2.0"  />
+  </Target>
+
+  <Target Name="StampTargets" BeforeTargets="GenerateNuSpec">
+    <PropertyGroup>
+      <_FacadeFiles Condition="'%(File.Facade)' == 'true' AND '%(File.Extension)' == '.dll'" >@(File->'%24(MSBuildThisFileDirectory)ref\%(FileName)%(Extension)')</_FacadeFiles>
+    </PropertyGroup>
+    <Error Condition="'$(_FacadeFiles)' == ''" Text="Could not determine facade file names to write to targets" />
+
+    <MakeDir Directories="$(IntermediateOutputPath)$(NETStandardVersion)" />
+
+    <WriteLinesToFile File="$(VersionTargetsSource)"
+                      Lines="$([System.IO.File]::ReadAllText('$(VersionTargetsTemplate)').Replace('#VERSION#', '$(PackageVersion)').Replace('#NETSTANDARDFACADES#', '$(_FacadeFiles)'))"
+                      Overwrite="true" />
+  </Target>
+
+  <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), Directory.Build.targets))\Directory.Build.targets" />
+
+</Project>

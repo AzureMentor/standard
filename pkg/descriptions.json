@@ -5,14 +5,14 @@
         "CommonTypes": [ ]
     },
     {
-        "Name": "Microsoft.Packaging.Tools.Trimming",
-        "Description": "Provides build infrastructure for trimming unused files from an application.",
+        "Name": "NETStandard.Library",
+        "Description": "A set of standard .NET APIs that are prescribed to be used and supported together.",
         "CommonTypes": [
         ]
     },
     {
-        "Name": "NETStandard.Library",
-        "Description": "A set of standard .NET APIs that are prescribed to be used and supported together.",
+        "Name": "Microsoft.Private.Standard",
+        "Description": "A transport package for moving .NET Standard assets between repos",
         "CommonTypes": [
         ]
     }

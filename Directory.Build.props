@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+  <PropertyGroup>
+    <Copyright>$(CopyrightNetFoundation)</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <!--
+    For non-SDK projects that import this file and then import Microsoft.Common.props,
+    tell Microsoft.Common.props not to import Directory.Build.props again
+    -->
+    <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+
+    <ToolSetCommonDirectory>$(MSBuildThisFileDirectory)artifacts\toolset\Common\</ToolSetCommonDirectory>
+  </PropertyGroup>
+
+  <!-- Need to set ProjectAssetsFile to something so it doesn't get set to the Tools.proj assets file when we import the generated props -->
+  <PropertyGroup>
+    <ProjectAssetsFile Condition="'$(ProjectAssetsFile)' == ''">unused</ProjectAssetsFile>
+  </PropertyGroup>
+
+  <Import Project="$(ToolSetCommonDirectory)Tools.proj.nuget.g.props" Condition="Exists('$(ToolSetCommonDirectory)Tools.proj.nuget.g.props')" />
+
+  <PropertyGroup>
+    <ProjectAssetsFile Condition="'$(ProjectAssetsFile)' == 'unused'"></ProjectAssetsFile>
+  </PropertyGroup>
+
+  <!-- Common repo directories -->
+  <PropertyGroup>
+    <ProjectDir>$(MSBuildThisFileDirectory)</ProjectDir>
+
+    <!-- Input Directories -->
+    <SourceDir>$(ProjectDir)src/</SourceDir>
+    <PackagesDir>$(NuGetPackageRoot)</PackagesDir>
+
+    <!-- Respect environment variable for the .NET install directory if set; otherwise, use the current default location -->
+    <DotNetRoot Condition="'$(DotNetRoot)' == ''">$(DOTNET_INSTALL_DIR)</DotNetRoot>
+    <DotNetRoot Condition="'$(DotNetRoot)' == ''">$(ProjectDir).dotnet\</DotNetRoot>
+    <DotNetRoot Condition="!HasTrailingSlash('$(DotNetRoot)')">$(DotNetRoot)\</DotNetRoot>
+    <DotnetCliPath Condition="'$(DotnetCliPath)'==''">$(DotNetRoot)</DotnetCliPath>
+    <ToolHostCmd Condition="'$(ToolHostCmd)'==''">"$(DotNetRoot)dotnet"</ToolHostCmd>
+
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <!-- Set maximum version for NetStandard to 2.1, since we're now producing 2.1 out of this repo -->
+  <PropertyGroup>
+    <NETStandardMaximumVersion>2.1</NETStandardMaximumVersion>
+  </PropertyGroup>
+
+  <!-- workaround https://github.com/dotnet/sdk/issues/2288
+       remove once we have a new CLI -->
+  <PropertyGroup>
+    <LanguageTargets Condition="'$(LanguageTargets)' == '' and '$(MSBuildProjectExtension)' != '.csproj' and '$(MSBuildProjectExtension)' != '.vbproj' and '$(MSBuildProjectExtension)' != '.fsproj'">$(MSBuildToolsPath)\Microsoft.Common.targets</LanguageTargets>
+  </PropertyGroup>
+
+  <!-- Enable the analyzers for this repo -->
+  <PropertyGroup>
+    <IsSourceProject>$([System.Text.RegularExpressions.Regex]::IsMatch($(MSBuildProjectDirectory), 'src%24'))</IsSourceProject>
+    <EnableAnalyzers Condition="'$(EnableAnalyzers)'=='' and '$(IsSourceProject)' == 'true'">true</EnableAnalyzers>
+  </PropertyGroup>
+
+  <!-- Import packaging props -->
+  <Import Project="Packaging.props"/>
+
+  <PropertyGroup>
+    <!-- By default make all libraries to be AnyCPU but individual projects can override it if they need to -->
+    <Platform>AnyCPU</Platform>
+    <OutputType>Library</OutputType>
+    <RunApiCompat>$(IsSourceProject)</RunApiCompat>
+    <BaselineAllAPICompatError Condition="'$(BaselineAllAPICompatError)' == ''">true</BaselineAllAPICompatError>
+    <BaselineAllAPICompatError Condition="'$(ContinuousIntegrationBuild)' == 'true'">false</BaselineAllAPICompatError>
+    <LangVersion>latest</LangVersion> <!-- default to allowing all language features -->
+  </PropertyGroup>
+  
+  <!-- Redefine this here so that it can be picked up by GetFilesToPackage -->
+  <PropertyGroup>
+    <XmlDocFileRoot>$(PackagesDir)$(XmlDocPackage.ToLowerInvariant())/$(XmlDocPackageVersion)/xmldocs/netstandard</XmlDocFileRoot>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <StrongNameKeyId>Open</StrongNameKeyId>
+  </PropertyGroup>
+
+  <!-- Set up Default symbol and optimization for Configuration -->
+  <Choose>
+    <When Condition="'$(Configuration)' == 'Debug'">
+      <PropertyGroup>
+        <DebugSymbols Condition="'$(DebugSymbols)' == ''">true</DebugSymbols>
+        <Optimize Condition="'$(Optimize)' == ''">false</Optimize>
+        <DebugType>full</DebugType>
+        <DefineConstants>$(DefineConstants),DEBUG,TRACE</DefineConstants>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(Configuration)' == 'Release'">
+      <PropertyGroup>
+        <DebugSymbols Condition="'$(DebugSymbols)' == ''">true</DebugSymbols>
+        <Optimize Condition="'$(Optimize)' == ''">true</Optimize>
+        <DebugType>pdbonly</DebugType>
+        <DefineConstants>$(DefineConstants),TRACE</DefineConstants>
+      </PropertyGroup>
+    </When>
+  </Choose>
+
+  <!-- Disable some standard properties for building our projects -->
+  <PropertyGroup>
+    <NoStdLib>true</NoStdLib>
+    <NoExplicitReferenceToStdLib>true</NoExplicitReferenceToStdLib>
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+
+    <!-- Don't reference implicit framework packages, all projects in this repo must be explicit -->
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+
+    <!-- Suppress preview message as we are usually using preview SDK versions. -->
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+  </PropertyGroup>
+
+  <!-- Set up handling of build warnings -->
+  <PropertyGroup>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <Import Project="$(RepositoryEngineeringDir)ReferenceAssemblies.props" />
+
+  <!-- Set a value for FrameworkPathOverride to avoid invoking GetReferenceAssemblyPaths -->
+  <PropertyGroup>
+    <FrameworkPathOverride>$(DotNetRoot)</FrameworkPathOverride>
+  </PropertyGroup>
+
+  <!-- Target Framework Moniker values to be used in our projects -->
+  <PropertyGroup>
+    <UapRs3Tfm>uap10.0.15138</UapRs3Tfm>
+  </PropertyGroup>
+
+  <!-- Use Roslyn Compilers to build -->
+  <Import Project="$(RoslynPropsFile)" Condition="'$(RunningOnUnix)'!='true' and Exists('$(RoslynPropsFile)') and '$(UseRoslynCompilers)'!='false' and '$(RoslynIncompatibleMsbuildVersion)' != 'true'" />
+  <Import Project="$(RoslynPropsFile)" Condition="'$(RunningOnUnix)'=='true' and Exists('$(RoslynPropsFile)') and '$(RoslynIncompatibleMsbuildVersion)' != 'true'"/>
+</Project>

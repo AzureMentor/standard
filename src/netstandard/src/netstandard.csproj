@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>netstandard</AssemblyName>
+    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <TargetFrameworks>net461;xamarin.ios;xamarin.watchos;xamarin.tvos;xamarin.mac;monoandroid</TargetFrameworks>
+    <!-- custom target framework settings to satisfy SDK and msbuild. -->
+    <TargetFrameworkIdentifier Condition="'$(TargetFramework)' != 'net461'">$(TargetFramework)</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion Condition="'$(TargetFramework)' != 'net461'">0.0</TargetFrameworkVersion>
+    <!-- Use fallback until we have a compatibility mapping for netstandard2.1. -->
+    <AssetTargetFallback>netstandard2.1</AssetTargetFallback>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <DisableStandardFrameworkResolution>true</DisableStandardFrameworkResolution>
+    <ContractProject>..\ref\netstandard.csproj</ContractProject>
+    <IsPartialFacadeAssembly>true</IsPartialFacadeAssembly>
+    <GenFacadesIgnoreMissingTypes>true</GenFacadesIgnoreMissingTypes>
+    <RunApiCompatForSrc>true</RunApiCompatForSrc>
+    <RunMatchingRefApiCompat>false</RunMatchingRefApiCompat>
+    <ApiCompatBaseline>$(MSBuildProjectDirectory)\ApiCompatBaseline.$(TargetFramework).txt</ApiCompatBaseline>
+    <NoWarn>$(NoWarn);618</NoWarn>
+  </PropertyGroup>
+
+  <!-- Disable code paths that require project.assets.json files to be present or to be computed. -->
+  <PropertyGroup>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <ComputeNETCoreBuildOutputFiles>false</ComputeNETCoreBuildOutputFiles>
+    <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
+  </PropertyGroup>
+  
+  <ItemGroup>
+      <!-- Omit System.Void since C# doesn't permit the use of the `System.Void`
+         typename and instead requires callers to use the `void` keyword. -->
+    <GenFacadesOmitType Include="System.Void" />
+    <Compile Include="System.Void.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(ContractProject)">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>ResolvedMatchingContract</OutputItemType>
+    </ProjectReference>
+  </ItemGroup>
+  
+  <!-- we don't require a target since we use ProjectReference -->
+  <Target Name="ResolveMatchingContract" />
+
+  <ItemGroup>
+    <!-- Mark netstandard as a framework assembly -->
+    <AssemblyMetadata Include=".NETFrameworkAssembly">
+      <Value></Value>
+    </AssemblyMetadata>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+    <PackageDestination Include="build/$(TargetFramework)/ref">
+      <TargetFramework>$(TargetFramework)</TargetFramework>
+    </PackageDestination>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\platforms\$(TargetFramework)\**\*.csproj" />
+  </ItemGroup>
+</Project>

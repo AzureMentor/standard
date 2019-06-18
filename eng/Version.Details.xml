@@ -1,10 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
-  <ProductDependencies></ProductDependencies>
+  <ProductDependencies>
+  </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="1.0.0-beta.18476.9">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="1.0.0-beta.19318.2">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>93c266ed3f599a4c083068c0e798f22c5a39f874</Sha>
+      <Sha>dc538a29793fd56618d0fa3186e2388d47d00c19</Sha>
     </Dependency>
+    <Dependency Name="Microsoft.DotNet.ApiCompat" Version="1.0.0-beta.19318.2">
+      <Uri>https://github.com/dotnet/arcade</Uri>
+      <Sha>dc538a29793fd56618d0fa3186e2388d47d00c19</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.DotNet.Build.Tasks.Packaging" Version="1.0.0-beta.19318.2">
+      <Uri>https://github.com/dotnet/arcade</Uri>
+      <Sha>dc538a29793fd56618d0fa3186e2388d47d00c19</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.DotNet.CodeAnalysis" Version="1.0.0-beta.19318.2">
+      <Uri>https://github.com/dotnet/arcade</Uri>
+      <Sha>dc538a29793fd56618d0fa3186e2388d47d00c19</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.DotNet.GenAPI" Version="1.0.0-beta.19318.2">
+      <Uri>https://github.com/dotnet/arcade</Uri>
+      <Sha>dc538a29793fd56618d0fa3186e2388d47d00c19</Sha>
+    </Dependency>
+    <Dependency Name="Microsoft.DotNet.GenFacades" Version="1.0.0-beta.19318.2">
+      <Uri>https://github.com/dotnet/arcade</Uri>
+      <Sha>dc538a29793fd56618d0fa3186e2388d47d00c19</Sha>
+    </Dependency>
+    <Dependency Name="System.Reflection.Emit" Version="4.6.0-preview7.19318.1">
+      <Uri>https://github.com/dotnet/corefx</Uri>
+      <Sha>1fca079ddec2aabf56e256dab03e39b31b5036c7</Sha>
+    </Dependency>
+    <Dependency Name="System.Reflection.Emit.ILGeneration" Version="4.6.0-preview7.19318.1">
+      <Uri>https://github.com/dotnet/corefx</Uri>
+      <Sha>1fca079ddec2aabf56e256dab03e39b31b5036c7</Sha>
+    </Dependency>
+    <Dependency Name="System.Reflection.Emit.Lightweight" Version="4.6.0-preview7.19318.1">
+      <Uri>https://github.com/dotnet/corefx</Uri>
+      <Sha>1fca079ddec2aabf56e256dab03e39b31b5036c7</Sha>
+    </Dependency>
+    <PinnedDependency Name="NETStandard.Library" Version="2.0.3">
+      <Uri>https://github.com/dotnet/standard</Uri>
+    </PinnedDependency>
   </ToolsetDependencies>
 </Dependencies>

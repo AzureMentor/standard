@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Microsoft.Win32.Primitives</AssemblyName>
+    <AssemblyVersion>4.0.3.0</AssemblyVersion>
+    <StrongNameKeyId>Microsoft</StrongNameKeyId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Microsoft.Win32.Primitives.Forwards.cs" />
+    <ProjectReference Include="..\..\..\ref\netstandard.csproj" />
+  </ItemGroup>
+</Project>
